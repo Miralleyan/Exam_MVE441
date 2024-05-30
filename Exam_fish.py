@@ -52,9 +52,6 @@ x_train_np = x_train.to_numpy()
 transform = False #Tries different ways of preprocessing the data, scaling pca, and Kbest features selection
 
 
-x_train._append(x_train)
-print("hello")
-
 exercise1c = True
 
 ######################################################################################################################
