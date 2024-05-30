@@ -171,10 +171,13 @@ if plot_mislabel == 1:
 
     label_dic_6 = {x[0]:x[1].index(6) for x in label_dic.items() if (6 in x[1])}
     label_dic_5 = {x[0]:x[1].index(5) for x in label_dic.items() if (5 in x[1])}
+    label_dic_4 = {x[0]:x[1].index(4) for x in label_dic.items() if (4 in x[1])}
 
     ## Remove for harder criteria
     label_dic_6.update(label_dic_5)
+    #label_dic_6.update(label_dic_4)
 
+    #dic = {x[0]:x[1] for x in pred_dic.items() if (x[1] == 0 or x[1] == 1) or x[1]==2}
     dic = {x[0]:x[1] for x in pred_dic.items() if (x[1] == 0 or x[1] == 1)}
     #dic = {x[0]:x[1] for x in pred_dic.items() if (x[1] == 0)}
 
