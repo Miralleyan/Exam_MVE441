@@ -98,8 +98,8 @@ def calculate(data):
         accuracy_mean += class_accuracy[:,:,i]/7
     return sensitivity, specificty, accuracy, class_sensitivity, class_specificty, class_accuracy
 
-plot_certain = 1
-plot_uncertain = 1
+plot_certain = 0
+plot_uncertain = 0
 plot_mislabel  = 1
 all_feat = 0
 calc = 0
@@ -112,7 +112,7 @@ acc_classes_features = 0
 if plot_certain == 1:
     prob = pd.read_csv("./Data/class_prob_mean", sep=",", index_col=0)
     print(prob)
-    cert_dic = {ind:np.argmax(prob.loc[ind]) for ind in prob.index if (sum(prob.loc[ind]>0.5)>0 and sum(prob.loc[ind]>0.35) < 2)}
+    cert_dic = {ind:np.argmax(prob.loc[ind]) for ind in prob.index if (sum(prob.loc[ind]>0.5)>0 and sum(prob.loc[ind]>0.20) < 2)}
     #print([prob.loc[ind] for ind in prob_dic])
     print(len(cert_dic))
 
@@ -200,15 +200,14 @@ if plot_mislabel == 1:
     #fig, axs = plt.subplots(k,k)
     j = 0
     l= 4
-    #for color, i, species in zip(colors, range(7), fishes):
-    #    plt.scatter(x_scaled_np[y_train == i, j],x_scaled_np[y_train == i, l], color = color, label = species)
-    #    plt.xlabel("Feature 1")
-    #    plt.ylabel("Feature 5")
+    for color, i, species in zip(colors, range(7), fishes):
+        plt.scatter(x_scaled_np[y_train == i, j],x_scaled_np[y_train == i, l], color = color, label = species)
+        plt.xlabel("Feature 1")
+        plt.ylabel("Feature 5")
     #plt.scatter(failed[:,j], failed[:,l], color = "orange" , label ="Mislabel?", s = 100)
     plt.legend()
     plt.scatter(mislab[:,j], mislab[:,l], c = og_col, label ="Mislabel?", s = 150)
-    plt.scatter(mislab[:,j], mislab[:,l],c = col, label ="Mislabel?", s = 75)
-
+    plt.scatter(mislab[:,j], mislab[:,l],c = col, label ="Mislabel?", s = 25)
     plt.show()
 
 if all_feat == 1:
