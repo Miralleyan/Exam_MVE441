@@ -60,11 +60,13 @@ exercise1c = True
 if exercise1c == 1:
     ### Adding extra features ###
     add = 200
-    for run in range(2,11):
+    for run in range(1,11):
         print(f"Now have {add*run} features")
         new_features = pd.concat([pd.DataFrame(data = stats.norm(loc =stats.norm(scale = 4).rvs(), scale = 3).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{run*add+i}"]) for i in range(add)], axis=1)
         x_train = pd.concat([x_train,new_features ], axis = 1)
-
+        
+        if run == 1:
+            continue
 
         ### Scaling data ###
         scaler = StandardScaler()
