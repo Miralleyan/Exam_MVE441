@@ -282,7 +282,7 @@ if exercise1c == 1:
                     #print(feature_scores)
                     y_pred_mat = y_pred_mat._append(pd.concat([KNN_y_pred,  LR_y_pred, RF_y_pred], axis=1))
                     #print(y_pred_mat)
-                if n == 6:
+                if n == 6 and exercise1c == 0:
                     class_prob = class_prob._append((KNN_prob+ QDA_prob+LR_prob+RF_prob+SVC_prob+LDA_prob)/6)
                     #print(class_prob)
 
