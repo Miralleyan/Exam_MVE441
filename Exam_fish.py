@@ -65,8 +65,8 @@ if exercise1c == 1:
         new_features = pd.concat([pd.DataFrame(data = stats.norm(loc =stats.norm(scale = 4).rvs(), scale = 3).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{run*add+i}"]) for i in range(add)], axis=1)
         x_train = pd.concat([x_train,new_features ], axis = 1)
         
-        if run == 1:
-            continue
+        #if run == 1:
+        #    continue
 
         ### Scaling data ###
         scaler = StandardScaler()
@@ -137,88 +137,90 @@ if exercise1c == 1:
 
 
                 ### QDA ###
+                QDA = QuadraticDiscriminantAnalysis(reg_param=0.5)
+
+                ## Feature selection ## 
+                if n == 6 and exercise1c == 0:
+                    x_QDA = x
+                    x_QDA_val = x_val
+                    QDA.fit(x,y)
+
+                    QDA_prob = pd.DataFrame(data=QDA.predict_proba(x_QDA_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
+
+                    QDA_features = pd.DataFrame(data=[True]*6, columns=["QDA"], index=[l for l in range(6*i, 6*(i+1))])
+                else:
+                    SFS_QDA = SequentialFeatureSelector(QDA, n_features_to_select=n, cv=10)
+                    x_QDA = SFS_QDA.fit_transform(x,y)
+                    x_QDA_val = SFS_QDA.transform(x_val)
+                    QDA.fit(x_QDA, y)
+
+                    QDA_features = pd.DataFrame(data=SFS_QDA.support_, columns=["QDA"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
+
+                ## Prediction ##
+                y_pred = QDA.predict(x_QDA_val)
+                QDA_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["QDA_pred"], index= x_val.index)
+                #print(QDA_y_pred)
                 if exercise1c == 0:
-                    QDA = QuadraticDiscriminantAnalysis(reg_param=0.5)
-
-                    ## Feature selection ## 
-                    if n == 6:
-                        x_QDA = x
-                        x_QDA_val = x_val
-                        QDA.fit(x,y)
-
-                        QDA_prob = pd.DataFrame(data=QDA.predict_proba(x_QDA_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
-
-                        QDA_features = pd.DataFrame(data=[True]*6, columns=["QDA"], index=[l for l in range(6*i, 6*(i+1))])
-                    else:
-                        SFS_QDA = SequentialFeatureSelector(QDA, n_features_to_select=n, cv=10)
-                        x_QDA = SFS_QDA.fit_transform(x,y)
-                        x_QDA_val = SFS_QDA.transform(x_val)
-                        QDA.fit(x_QDA, y)
-
-                        QDA_features = pd.DataFrame(data=SFS_QDA.support_, columns=["QDA"], index=[l for l in range(6*i, 6*(i+1))])
-
-                    ## Prediction ##
-                    y_pred = QDA.predict(x_QDA_val)
-                    QDA_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["QDA_pred"], index= x_val.index)
-                    #print(QDA_y_pred)
-
                     QDA_con_mat = pd.DataFrame(data=confusion_matrix(y_pred, y_val), columns=[f"QDA_{p+1}" for p in range(7)], index=[l for l in range(7*i, 7*(i+1))])
                     #print("QDA", QDA_index)
 
-                ### LR ###
-                LR = LogisticRegression(penalty="elasticnet", class_weight="balanced", solver="saga", l1_ratio=0.5, max_iter=200)
-
-                ## Feature selection ##
-                RFE_LR = RFE(LR, n_features_to_select=n).fit(x,y)
-                x_LR = RFE_LR.transform(x)
-                x_LR_val = RFE_LR.transform(x_val)
-                #print(RFE_LR.support_)
-                LR.fit(x_LR, y)
-
-                ## Prediction ##
-                y_pred = LR.predict(x_LR_val)
-                LR_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["LR_pred"], index= x_val.index)
-
-                if n == 6:
-                    LR_prob = pd.DataFrame(data=LR.predict_proba(x_LR_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
-
-                if exercise1c == 0:
-                    LR_features = pd.DataFrame(data=RFE_LR.support_, columns=["LR"], index=[l for l in range(6*i, 6*(i+1))])
-                    LR_con_mat = pd.DataFrame(data=confusion_matrix(LR.predict(x_LR_val), y_val), columns=[f"LR_{p+1}" for p in range(7)], index=[l for l in range(7*i, 7*(i+1))])
-
-                else:
-                    LR_features = pd.DataFrame(data=RFE_LR.support_, columns=["LR"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
-
-
-
-
-                ### RF ###
-                RF = RandomForestClassifier(n_estimators=500)
-
-                ## Feature selection ##
-                RFE_RF = RFE(RF, n_features_to_select=n).fit(x,y)
-                x_RF = RFE_RF.transform(x)
-                x_RF_val = RFE_RF.transform(x_val)
-                #print(RFE_RF.support_)
-                RF.fit(x_RF, y)
-
-                ## Predicition ##
-                y_pred = RF.predict(x_RF_val)
-                RF_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["RF_pred"], index= x_val.index)
-
-
-                if n == 6:
-                    RF_prob = pd.DataFrame(data=RF.predict_proba(x_RF_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
-
-                if exercise1c == 0:
-                    RF_features = pd.DataFrame(data=RFE_RF.support_, columns=["RF"], index=[l for l in range(6*i, 6*(i+1))])
-                    RF_con_mat = pd.DataFrame(data=confusion_matrix(RF.predict(x_RF_val), y_val), columns=[f"RF_{p+1}" for p in range(7)], index=[l for l in range(7*i, 7*(i+1))])
-
-                else:
-                    RF_features = pd.DataFrame(data=RFE_RF.support_, columns=["RF"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
 
 
                 if exercise1c == 0:
+                    ### LR ###
+                    LR = LogisticRegression(penalty="elasticnet", class_weight="balanced", solver="saga", l1_ratio=0.5, max_iter=200)
+
+                    ## Feature selection ##
+                    RFE_LR = RFE(LR, n_features_to_select=n).fit(x,y)
+                    x_LR = RFE_LR.transform(x)
+                    x_LR_val = RFE_LR.transform(x_val)
+                    #print(RFE_LR.support_)
+                    LR.fit(x_LR, y)
+
+                    ## Prediction ##
+                    y_pred = LR.predict(x_LR_val)
+                    LR_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["LR_pred"], index= x_val.index)
+
+                    if n == 6:
+                        LR_prob = pd.DataFrame(data=LR.predict_proba(x_LR_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
+
+                    if exercise1c == 0:
+                        LR_features = pd.DataFrame(data=RFE_LR.support_, columns=["LR"], index=[l for l in range(6*i, 6*(i+1))])
+                        LR_con_mat = pd.DataFrame(data=confusion_matrix(LR.predict(x_LR_val), y_val), columns=[f"LR_{p+1}" for p in range(7)], index=[l for l in range(7*i, 7*(i+1))])
+
+                    else:
+                        LR_features = pd.DataFrame(data=RFE_LR.support_, columns=["LR"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
+
+
+
+
+                    ### RF ###
+                    RF = RandomForestClassifier(n_estimators=500)
+
+                    ## Feature selection ##
+                    RFE_RF = RFE(RF, n_features_to_select=n).fit(x,y)
+                    x_RF = RFE_RF.transform(x)
+                    x_RF_val = RFE_RF.transform(x_val)
+                    #print(RFE_RF.support_)
+                    RF.fit(x_RF, y)
+
+                    ## Predicition ##
+                    y_pred = RF.predict(x_RF_val)
+                    RF_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["RF_pred"], index= x_val.index)
+
+
+                    if n == 6:
+                        RF_prob = pd.DataFrame(data=RF.predict_proba(x_RF_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
+
+                    if exercise1c == 0:
+                        RF_features = pd.DataFrame(data=RFE_RF.support_, columns=["RF"], index=[l for l in range(6*i, 6*(i+1))])
+                        RF_con_mat = pd.DataFrame(data=confusion_matrix(RF.predict(x_RF_val), y_val), columns=[f"RF_{p+1}" for p in range(7)], index=[l for l in range(7*i, 7*(i+1))])
+
+                    else:
+                        RF_features = pd.DataFrame(data=RFE_RF.support_, columns=["RF"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
+
+
+                    
                     ### SVC ###
                     svc = SVC(kernel="rbf", class_weight="balanced", probability = True)
 
@@ -280,9 +282,9 @@ if exercise1c == 1:
                     con_mat = con_mat._append(pd.concat([KNN_con_mat, QDA_con_mat, LR_con_mat, RF_con_mat, SVC_con_mat, LDA_con_mat], axis=1))
                     #print(result)
                 else:
-                    feature_scores = feature_scores._append(pd.concat([KNN_features, LR_features, RF_features], axis=1))
+                    feature_scores = feature_scores._append(pd.concat([KNN_features, QDA_features], axis=1))
                     #print(feature_scores)
-                    y_pred_mat = y_pred_mat._append(pd.concat([KNN_y_pred,  LR_y_pred, RF_y_pred], axis=1))
+                    y_pred_mat = y_pred_mat._append(pd.concat([KNN_y_pred, QDA_y_pred], axis=1))
                     #print(y_pred_mat)
                 if n == 6 and exercise1c == 0:
                     class_prob = class_prob._append((KNN_prob+ QDA_prob+LR_prob+RF_prob+SVC_prob+LDA_prob)/6)
@@ -296,7 +298,7 @@ if exercise1c == 1:
             else:
                 feature_scores.to_csv(f"./Data/feature_scores_{n}_feat_extra_feat_{run}", sep=",")
                 y_pred_mat.to_csv(f"./Data/y_pred_mat_{n}_feat_extra_feat_{run}", sep=",")
-            if n == 6:
+            if n == 6 and exercise1c == 0:
                 class_prob.to_csv(f"./Data/class_prob_mean", sep=",")
 
 
