@@ -129,4 +129,7 @@ for run in range(1,16):
         y_pred_mat = y_pred_mat._append(pd.concat([KNN_y_pred, QDA_y_pred, SVC_y_pred], axis=1))
 
     ### Saving data ###
-    y_pred_mat.to_csv(f"./Data/y_pred_mat_extra_feat_{run}", sep=",")
+    if corr == 1:
+        y_pred_mat.to_csv(f"./Data/y_pred_mat_extra_feat_corr_{run}", sep=",")
+    else:
+        y_pred_mat.to_csv(f"./Data/y_pred_mat_extra_feat_{run}", sep=",")
