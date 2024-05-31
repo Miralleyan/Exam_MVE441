@@ -98,9 +98,9 @@ def calculate(data):
         accuracy_mean += class_accuracy[:,:,i]/7
     return sensitivity, specificty, accuracy, class_sensitivity, class_specificty, class_accuracy
 
-plot_certain = 0
+plot_certain = 1
 plot_uncertain = 0
-plot_mislabel  = 1
+plot_mislabel  = 0
 all_feat = 0
 calc = 0
 total = 0
@@ -110,13 +110,30 @@ plot_accuracy_feat = 0
 acc_classes_features = 0
 
 if plot_certain == 1:
+    data = pd.read_csv(f"./Data/y_pred_mat_6_feat", sep=",", index_col=0)
     prob = pd.read_csv("./Data/class_prob_mean", sep=",", index_col=0)
     print(prob)
-    cert_dic = {ind:np.argmax(prob.loc[ind]) for ind in prob.index if (sum(prob.loc[ind]>0.5)>0 and sum(prob.loc[ind]>0.20) < 2)}
+
+    pred_dic = {ind: 0 for ind in data.index}
+    label_dic = {ind: [0,0,0,0,0,0,0] for ind in data.index}
+
+    for ind in data.index:
+        pred = data.loc[ind].values
+        #print(pred)
+        for i in range(1,7):
+            if pred[0] == pred[i]:
+                pred_dic[ind] += 1
+            else:
+                label_dic[ind][pred[i]] += 1 
+
+
+    #cert_dic = {ind:np.argmax(prob.loc[ind]) for ind in prob.index if (sum(prob.loc[ind]>0.5)>0 and sum(prob.loc[ind]>0.20) < 2)and np.argmax(prob.loc[ind]) == data.loc[ind].values[0] }
+    cert_dic = {ind:np.argmax(prob.loc[ind]) for ind in prob.index if (sum(prob.loc[ind]>0.7)>0)and np.argmax(prob.loc[ind]) == data.loc[ind].values[0] }
+
     #print([prob.loc[ind] for ind in prob_dic])
     print(len(cert_dic))
 
-    print(x_scaled.loc[1837])
+
     certain = x_scaled.loc[[x for x in cert_dic]].to_numpy()
     j = 0
     l= 4
@@ -125,8 +142,8 @@ if plot_certain == 1:
         plt.xlabel("Feature 1")
         plt.ylabel("Feature 5")
     plt.scatter(certain[:,j], certain[:,l], c = "cyan", label ="Certain")
-    #plt.legend()
-    #plt.show()
+    plt.legend()
+    plt.show()
 
 if plot_uncertain == 1:
     prob = pd.read_csv("./Data/class_prob_mean", sep=",", index_col=0)
