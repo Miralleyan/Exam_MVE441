@@ -45,7 +45,6 @@ for i in range(7):
 
 ## Split test data for later
 x_train, x_test, y_train, y_test = train_test_split(fish_df, fish_label, train_size=0.7, random_state=42)
-print(x_train)
 x_train_np = x_train.to_numpy()
 
 # Choose which part of the code to run
@@ -95,12 +94,11 @@ for n in range(1,7):
     skf = StratifiedKFold(n_splits=10)
     for i, (train_index, test_index) in enumerate(skf.split(x_train, y_train)):
         print(f"Outer fold {i}:")
-        x = x_train.iloc[train_index]
-        x_val = x_train.iloc[test_index]
+        x = x_scaled.iloc[train_index]
+        x_val = x_scaled.iloc[test_index]
         y = y_train[train_index]
         y_val = y_train[test_index]
                 
-        
         ### KNN ###
         KNN = KNeighborsClassifier(n_neighbors=5)
 
@@ -113,7 +111,6 @@ for n in range(1,7):
         ## Prediction ##
         y_pred = KNN.predict(x_KNN_val)
         KNN_y_pred = pd.DataFrame(data = np.array([y_val, y_pred]).T, columns=["y_val", "KNN_pred"], index=x_val.index)
-
         if n == 6:
             KNN_prob = pd.DataFrame(data=KNN.predict_proba(x_KNN_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
             
@@ -194,7 +191,6 @@ for n in range(1,7):
 
 
 
-        
         ### SVC ###
         svc = SVC(kernel="rbf", class_weight="balanced", probability = True)
 

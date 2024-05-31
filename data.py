@@ -113,12 +113,28 @@ acc_classes_features = 0
 if extra_feat == 1:
     KNN_acc = np.zeros((11,1))
     QDA_acc = np.zeros((11,1))
+    SVC_acc = np.zeros((11,1))
+
+    y_pred = pd.read_csv(f"./Data/y_pred_mat_{i}_feat", index_col=0)
+    KNN_acc[0] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+    QDA_acc[0] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+    SVC_acc[0] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+
+
+
     for i in range(1,11):
-        y_pred = pd.read_csv(f"./Data/y_pred_mat_6_feat_extra_feat_{i}", index_col=0)
+        y_pred = pd.read_csv(f"./Data/y_pred_mat_extra_feat_{i}", index_col=0)
         KNN_acc[i] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
         QDA_acc[i] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+        SVC_acc[i] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+
+    plt.plot(KNN_acc)
+    plt.plot(QDA_acc)
+    plt.plot(SVC_acc)
+    plt.show()
     print(KNN_acc)
     print(QDA_acc)
+    print(SVC_acc)
 
 
 if plot_certain == 1:

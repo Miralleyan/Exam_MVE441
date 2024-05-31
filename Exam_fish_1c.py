@@ -91,8 +91,8 @@ for run in range(1,16):
     skf = StratifiedKFold(n_splits=10)
     for i, (train_index, test_index) in enumerate(skf.split(x_train, y_train)):
         print(f"Outer fold {i}:")
-        x = x_train.iloc[train_index]
-        x_val = x_train.iloc[test_index]
+        x = x_scaled.iloc[train_index]
+        x_val = x_scaled.iloc[test_index]
         y = y_train[train_index]
         y_val = y_train[test_index]
                 
@@ -115,7 +115,6 @@ for run in range(1,16):
         #print(QDA_y_pred)
 
 
-        
         ### SVC ###
         svc = SVC(kernel="rbf", class_weight="balanced", probability = True)
         svc.fit(x, y)
