@@ -45,7 +45,7 @@ for i in range(7):
 
 ## Split test data for later
 x_train, x_test, y_train, y_test = train_test_split(fish_df, fish_label, train_size=0.7, random_state=42)
-
+print(x_train)
 x_train_np = x_train.to_numpy()
 
 # Choose which part of the code to run
@@ -53,6 +53,7 @@ transform = False #Tries different ways of preprocessing the data, scaling pca, 
 
 
 exercise1c = True
+corr = True
 
 ######################################################################################################################
 ##this code classfied using 6 different classifiers
@@ -62,8 +63,17 @@ if exercise1c == 1:
     add = 200
     for run in range(1,16):
         print(f"Now have {add*run} features")
+
+        ## Not correlated ##
         new_features = pd.concat([pd.DataFrame(data = stats.norm(loc =stats.norm(scale = 4).rvs(), scale = 3).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{run*add+i}"]) for i in range(add)], axis=1)
-        x_train = pd.concat([x_train,new_features ], axis = 1)
+
+        ## Correlated ##
+        new_features_corr =pd.concat([pd.DataFrame(data = x_train[x_train.columns[i%6]]*stats.norm(scale = 4).rvs() +stats.norm(scale = 4).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{run*add+i}"]) for i in range(add)], axis=1)
+        
+        if corr == 1:
+            x_train = pd.concat([x_train,new_features_corr], axis = 1)
+        else:
+            x_train = pd.concat([x_train,new_features], axis = 1)
         
         #if run == 1:
         #    continue
