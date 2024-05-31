@@ -49,7 +49,7 @@ x_train_np = x_train.to_numpy()
 
 # Choose which part of the code to run
 
-corr = True
+corr = False
 
 ######################################################################################################################
 ##this code classfied using 6 different classifiers
@@ -65,13 +65,10 @@ for run in range(1,16):
 
     ## Correlated ##
     new_features_corr =pd.concat([pd.DataFrame(data = x_train[x_train.columns[i%6]].to_numpy()*stats.norm(scale = 2).rvs() +stats.norm(scale = 10).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{(run-1)*add+i}"]) for i in range(add)], axis=1)
-    #print(x_train[x_train.columns[i%6]]*stats.norm(scale = 2).rvs() +stats.norm(scale = 10).rvs(size = len(x_train)).name)
-    print(new_features_corr)
     if corr == 1:
         x_train = pd.concat([x_train,new_features_corr], axis = 1)
     else:
         x_train = pd.concat([x_train, new_features], axis = 1)
-    print(x_train)
 
     #if run == 1:
     #    continue

@@ -106,9 +106,10 @@ for n in range(1,7):
         SK_KNN = SelectKBest(f_classif, k=n)
         x_KNN = SK_KNN.fit_transform(x,y)
         x_KNN_val = SK_KNN.transform(x_val)
-        KNN.fit(x_KNN, y)
+        
 
         ## Prediction ##
+        KNN.fit(x_KNN, y)
         y_pred = KNN.predict(x_KNN_val)
         KNN_y_pred = pd.DataFrame(data = np.array([y_val, y_pred]).T, columns=["y_val", "KNN_pred"], index=x_val.index)
         if n == 6:
@@ -153,16 +154,17 @@ for n in range(1,7):
         RFE_LR = RFE(LR, n_features_to_select=n).fit(x,y)
         x_LR = RFE_LR.transform(x)
         x_LR_val = RFE_LR.transform(x_val)
-        #print(RFE_LR.support_)
-        LR.fit(x_LR, y)
+        
 
         ## Prediction ##
+        LR.fit(x_LR, y)
         y_pred = LR.predict(x_LR_val)
-        LR_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["LR_pred"], index= x_val.index)
 
         if n == 6:
             LR_prob = pd.DataFrame(data=LR.predict_proba(x_LR_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
 
+        ## Save data ##
+        LR_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["LR_pred"], index= x_val.index)
         LR_features = pd.DataFrame(data=RFE_LR.support_, columns=["LR"], index=[l for l in range(6*i, 6*(i+1))])
         LR_con_mat = pd.DataFrame(data=confusion_matrix(LR.predict(x_LR_val), y_val), columns=[f"LR_{p+1}" for p in range(7)], index=[l for l in range(7*i, 7*(i+1))])
 
@@ -175,17 +177,17 @@ for n in range(1,7):
         RFE_RF = RFE(RF, n_features_to_select=n).fit(x,y)
         x_RF = RFE_RF.transform(x)
         x_RF_val = RFE_RF.transform(x_val)
-        #print(RFE_RF.support_)
-        RF.fit(x_RF, y)
+        
 
         ## Predicition ##
+        RF.fit(x_RF, y)
         y_pred = RF.predict(x_RF_val)
-        RF_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["RF_pred"], index= x_val.index)
-
 
         if n == 6:
             RF_prob = pd.DataFrame(data=RF.predict_proba(x_RF_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
 
+        ## Save data ##
+        RF_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["RF_pred"], index= x_val.index)
         RF_features = pd.DataFrame(data=RFE_RF.support_, columns=["RF"], index=[l for l in range(6*i, 6*(i+1))])
         RF_con_mat = pd.DataFrame(data=confusion_matrix(RF.predict(x_RF_val), y_val), columns=[f"RF_{p+1}" for p in range(7)], index=[l for l in range(7*i, 7*(i+1))])
 
@@ -201,22 +203,23 @@ for n in range(1,7):
             svc.fit(x,y)
 
             SVC_prob = pd.DataFrame(data=svc.predict_proba(x_SVC_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
-
             SVC_features = pd.DataFrame(data=[True]*6, columns=["SVC"], index=[l for l in range(6*i, 6*(i+1))])
+
         else:
             SFS_SVC = SequentialFeatureSelector(svc, n_features_to_select=n, cv=10)
             x_SVC = SFS_SVC.fit_transform(x,y)
             x_SVC_val = SFS_SVC.transform(x_val)
             svc.fit(x_SVC, y)
+
             SVC_features = pd.DataFrame(data=SFS_SVC.support_, columns=["SVC"], index=[l for l in range(6*i, 6*(i+1))])
-        #print(SFS_SVC.support_)
+
 
         ## Prediction ##
         y_pred = svc.predict(x_SVC_val)
-        SVC_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["SVC_pred"], index= x_val.index)
 
+        ## Save data ##
+        SVC_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["SVC_pred"], index= x_val.index)
         SVC_con_mat = pd.DataFrame(data=confusion_matrix(y_pred, y_val), columns=[f"SVC_{p+1}" for p in range(7)], index=[l for l in range(7*i, 7*(i+1))])
-        #print("SVC", SVC_index)
 
 
         ### LDA ###
@@ -226,34 +229,31 @@ for n in range(1,7):
         RFE_LDA = RFE(LDA, n_features_to_select=n).fit(x,y)
         x_LDA = RFE_LDA.transform(x)
         x_LDA_val = RFE_LDA.transform(x_val)
-        #print(RFE_LDA.support_)
-        LDA.fit(x_LDA, y)
-
+        
         if n == 6:
             LDA_prob = pd.DataFrame(data=LDA.predict_proba(x_LDA_val), columns=[f"{fishes[i]}" for i in range(7)], index=x_val.index)
         
-        LDA_features = pd.DataFrame(data=RFE_LDA.support_, columns=["LDA"], index=[l for l in range(6*i, 6*(i+1))])
 
 
         ## Prediction ##
+        LDA.fit(x_LDA, y)
         y_pred = LDA.predict(x_LDA_val)
-        LDA_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["LDA_pred"], index= x_val.index)
 
+        ## Save data ##
+        LDA_y_pred = pd.DataFrame(data = np.array([y_pred]).T, columns=["LDA_pred"], index= x_val.index)
+        LDA_features = pd.DataFrame(data=RFE_LDA.support_, columns=["LDA"], index=[l for l in range(6*i, 6*(i+1))])
         LDA_con_mat = pd.DataFrame(data=confusion_matrix(y_pred, y_val), columns=[f"LDA_{p+1}" for p in range(7)], index=[l for l in range(7*i, 7*(i+1))])
         #print("LDA", LDA_index)
 
 
         ### Merging data ###
         feature_scores = feature_scores._append(pd.concat([KNN_features, QDA_features, LR_features, RF_features, SVC_features, LDA_features], axis=1))
-        #print(feature_scores)
         y_pred_mat = y_pred_mat._append(pd.concat([KNN_y_pred, QDA_y_pred, LR_y_pred, RF_y_pred, SVC_y_pred, LDA_y_pred], axis=1))
-        #print(y_pred_mat)
         con_mat = con_mat._append(pd.concat([KNN_con_mat, QDA_con_mat, LR_con_mat, RF_con_mat, SVC_con_mat, LDA_con_mat], axis=1))
-        #print(result)
 
         if n == 6:
             class_prob = class_prob._append((KNN_prob+ QDA_prob+LR_prob+RF_prob+SVC_prob+LDA_prob)/6)
-            #print(class_prob)
+
 
     ### Saving data ###
     feature_scores.to_csv(f"./Data/feature_scores_{n}_feat", sep=",")
