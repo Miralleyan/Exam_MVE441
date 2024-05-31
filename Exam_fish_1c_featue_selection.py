@@ -127,7 +127,7 @@ for run in range(1,16):
             #x_SVC = SFS_SVC.fit_transform(x,y)
             #x_SVC_val = SFS_SVC.transform(x_val)
             #svc.fit(x_SVC, y)
-            SVC_features = pd.DataFrame(data=SFS_SVC.support_, columns=["SVC"], index=[l for l in range(6*i, 6*(i+1))])
+            SVC_features = pd.DataFrame(data=SFS_SVC.support_, columns=["SVC"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
 
 
             ### Merging data ###
