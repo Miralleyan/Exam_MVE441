@@ -52,7 +52,7 @@ x_train_np = x_train.to_numpy()
 transform = False #Tries different ways of preprocessing the data, scaling pca, and Kbest features selection
 
 
-corr = False
+corr = True
 
 ######################################################################################################################
 ##this code classfied using 6 different classifiers
