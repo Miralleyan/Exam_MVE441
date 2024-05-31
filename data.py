@@ -98,7 +98,8 @@ def calculate(data):
         accuracy_mean += class_accuracy[:,:,i]/7
     return sensitivity, specificty, accuracy, class_sensitivity, class_specificty, class_accuracy
 
-plot_certain = 1
+extra_feat = 1
+plot_certain = 0
 plot_uncertain = 0
 plot_mislabel  = 0
 all_feat = 0
@@ -108,6 +109,17 @@ acc_classes = 0
 feat_dic = 0
 plot_accuracy_feat = 0
 acc_classes_features = 0
+
+if extra_feat == 1:
+    KNN_acc = np.zeros((11,1))
+    QDA_acc = np.zeros((11,1))
+    for i in range(1,11):
+        y_pred = pd.read_csv(f"./Data/y_pred_mat_6_feat_extra_feat_{i}", index_col=0)
+        KNN_acc[i] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+        QDA_acc[i] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+    print(KNN_acc)
+    print(QDA_acc)
+
 
 if plot_certain == 1:
     data = pd.read_csv(f"./Data/y_pred_mat_6_feat", sep=",", index_col=0)
