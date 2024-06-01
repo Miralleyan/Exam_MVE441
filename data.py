@@ -72,11 +72,17 @@ def calculate(data):
     for i in range(10):
         for j in range(6):
             con_mat = data.iloc[[l for l in range(7*i,7*(i+1))], [l for l in range(7*j, 7*(j+1))]]
-            print(con_mat)
+            #print(con_mat)
             #print(sum(con_mat.iloc[k,l] for k in range(7) for l in range(7)))
             for l in range(7):
                 accuracy[i,j] += con_mat.iloc[l,l]/sum(con_mat.iloc[k,l] for k in range(7) for l in range(7)) ##number of data points
-                class_accuracy[i,j,l] = con_mat.iloc[l,l]/sum(con_mat.iloc[k,l] for k in range(0,7))
+
+                denom = 0
+                for s in range(7):
+                    denom += con_mat.iloc[s,s]
+                    class_accuracy[i,j,l] += con_mat.iloc[s,s]
+                denom += sum(con_mat.iloc[l, k] for k in range(7) if l != k) + sum(con_mat.iloc[k,l] for k in range(7) if l != k)
+                class_accuracy[i,j,l] = class_accuracy[i,j,l]/denom
                 
                 denom_spec = [con_mat.iloc[p,s] for p in range(7) for s in range(7) if s!=l]
                 class_specificty[i,j,l] = sum([con_mat.iloc[p,s] for p in range(7) for s in range(7) if s!=l and p!=l])/sum(denom_spec)
@@ -98,10 +104,11 @@ def calculate(data):
         accuracy_mean += class_accuracy[:,:,i]/7
     return sensitivity, specificty, accuracy, class_sensitivity, class_specificty, class_accuracy
 
-extra_feat = 0
+extra_feat = 1
+extra_feat_corr = 1
 plot_certain = 0
 plot_uncertain = 0
-plot_mislabel  = 1
+plot_mislabel  = 0
 all_feat = 0
 calc = 0
 total = 0
@@ -111,30 +118,61 @@ plot_accuracy_feat = 0
 acc_classes_features = 0
 
 if extra_feat == 1:
-    KNN_acc = np.zeros((11,1))
-    QDA_acc = np.zeros((11,1))
-    SVC_acc = np.zeros((11,1))
+    nr= 15
+    KNN_acc = np.zeros((nr+1,1))
+    QDA_acc = np.zeros((nr+1,1))
+    SVC_acc = np.zeros((nr+1,1))
 
-    y_pred = pd.read_csv(f"./Data/y_pred_mat_{i}_feat", index_col=0)
+    y_pred = pd.read_csv(f"./Data/y_pred_mat_{6}_feat", index_col=0)
     KNN_acc[0] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
     QDA_acc[0] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
     SVC_acc[0] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
 
 
 
-    for i in range(1,11):
+    for i in range(1,nr+1):
         y_pred = pd.read_csv(f"./Data/y_pred_mat_extra_feat_{i}", index_col=0)
         KNN_acc[i] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
         QDA_acc[i] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
         SVC_acc[i] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
 
-    plt.plot(KNN_acc)
-    plt.plot(QDA_acc)
-    plt.plot(SVC_acc)
+    plt.plot(KNN_acc, label = "KNN")
+    plt.plot(QDA_acc, label = "QDA")
+    plt.plot(SVC_acc, label = "SVC")
+    plt.xticks(list(range(0,nr+1)), list(range(0,200*(nr+1), 200)))
+    plt.xlabel("Extra features (non-correlated with original features)")
+    plt.ylabel("Accuracy")
+    plt.legend()
     plt.show()
-    print(KNN_acc)
-    print(QDA_acc)
-    print(SVC_acc)
+
+
+if extra_feat_corr == 1:
+    nr= 15
+    KNN_acc = np.zeros((nr+1,1))
+    QDA_acc = np.zeros((nr+1,1))
+    SVC_acc = np.zeros((nr+1,1))
+
+    y_pred = pd.read_csv(f"./Data/y_pred_mat_{6}_feat", index_col=0)
+    KNN_acc[0] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+    QDA_acc[0] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+    SVC_acc[0] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+
+
+
+    for i in range(1,nr+1):
+        y_pred = pd.read_csv(f"./Data/y_pred_mat_extra_feat_corr_{i}", index_col=0)
+        KNN_acc[i] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+        QDA_acc[i] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+        SVC_acc[i] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+
+    plt.plot(KNN_acc, label = "KNN")
+    plt.plot(QDA_acc, label = "QDA")
+    plt.plot(SVC_acc, label = "SVC")
+    plt.xticks(list(range(0,nr+1)), list(range(0,200*(nr+1), 200)))
+    plt.xlabel("Extra features (correlated with original features)")
+    plt.ylabel("Accuracy")
+    plt.legend()
+    plt.show()
 
 
 if plot_certain == 1:
@@ -156,7 +194,7 @@ if plot_certain == 1:
 
 
     #cert_dic = {ind:np.argmax(prob.loc[ind]) for ind in prob.index if (sum(prob.loc[ind]>0.5)>0 and sum(prob.loc[ind]>0.20) < 2)and np.argmax(prob.loc[ind]) == data.loc[ind].values[0] }
-    cert_dic = {ind:np.argmax(prob.loc[ind]) for ind in prob.index if (sum(prob.loc[ind]>0.7)>0)and np.argmax(prob.loc[ind]) == data.loc[ind].values[0] }
+    cert_dic = {ind:np.argmax(prob.loc[ind]) for ind in prob.index if (sum(prob.loc[ind]>0.8)>0)and np.argmax(prob.loc[ind]) == data.loc[ind].values[0] }
 
     #print([prob.loc[ind] for ind in prob_dic])
     print(len(cert_dic))
@@ -198,7 +236,7 @@ if plot_mislabel == 1:
     data = pd.read_csv(f"./Data/y_pred_mat_6_feat", sep=",", index_col=0)
     prob = pd.read_csv("./Data/class_prob_mean", sep=",", index_col=0)
     #print(prob)
-    prob_dic = {ind:np.argmax(prob.loc[ind]) for ind in prob.index if sum(prob.loc[ind]>=0.7) >0}
+    prob_dic = {ind:np.argmax(prob.loc[ind]) for ind in prob.index if sum(prob.loc[ind]>=0.8) >0}
 
     pred_dic = {ind: 0 for ind in data.index}
     label_dic = {ind: [0,0,0,0,0,0,0] for ind in data.index}
@@ -324,32 +362,55 @@ if feat_dic == 1:
 
 if plot_accuracy_feat == 1:
     mean_feature_accuracy = np.zeros((6,6)) #Mean accuracy for all models for all number of features, columns features, rows models
+    mean_feature_specificty = np.zeros((6,6)) 
+    mean_feature_sensitivity = np.zeros((6,6)) 
+
     mean_accuracy = np.zeros((6,1)) #Mean accuracy of all models for each number of features
     fig, axs = plt.subplots(1,6)
     for i in range(6):
         data = pd.read_csv(f"./Data/con_mat_{(i)+1}_feat", sep=",", index_col=0)
 
-        accuracy, class_accuracy = accuracy_fcn(data)
+       #accuracy, class_accuracy = accuracy_fcn(data)
+        sensitivity, specificty, accuracy, class_sensitivity, class_specificty, class_accuracy = calculate(data)
+
 
         for s in range(6):
             mean_accuracy[s] += accuracy[:,s].mean()/6
             #print(mean_feature_accuracy[s,:])
             mean_feature_accuracy[s,i] = accuracy[:,s].mean()
+            mean_feature_specificty[s,i] = specificty[:,s].mean()
+            mean_feature_sensitivity[s,i] = sensitivity[:,s].mean()
             #print(mean_feature_accuracy)
         #print(accuracy)
 
 
         axs[i].boxplot(accuracy)
         axs[i].title.set_text(f"{i+1} features")
-        axs[i].set(xlabel='KNN   QDA  LR   RF  SVC LDA', ylabel='Accuracy', ylim =[0.2, 1] )
+        axs[i].set_xticks(list(range(1,7)), labels = ["KNN", "QDA", "LR", "RF","SVC", "LDA"])
+        axs[i].set( ylabel='Accuracy', ylim =[0.2, 1] )
+
     plt.show()
 
     #print(accuracy)
+    fig,axs = plt.subplots(1,3)
+
     for i in range(6):
-        plt.plot([1,2,3,4,5,6],mean_feature_accuracy[i,:], label = methods[i])
-    plt.xlabel("Number of features")
-    plt.ylabel("Mean accuracy for model over 10 runs")
-    plt.ylim([0.3,1])
+        axs[0].plot([1,2,3,4,5,6],mean_feature_accuracy[i,:], label = methods[i])
+    axs[0].set_xlabel("Number of features")
+    axs[0].set_ylabel("Mean accuracy for model over 10 runs")
+    axs[0].set_ylim([0.3,1])
+
+    for i in range(6):
+        axs[1].plot([1,2,3,4,5,6],mean_feature_specificty[i,:], label = methods[i])
+    axs[1].set_xlabel("Number of features")
+    axs[1].set_ylabel("Mean specificity for model over 10 runs")
+    axs[1].set_ylim([0.3,1])
+
+    for i in range(6):
+        axs[2].plot([1,2,3,4,5,6],mean_feature_sensitivity[i,:], label = methods[i])
+    axs[2].set_xlabel("Number of features")
+    axs[2].set_ylabel("Mean sensitivity for model over 10 runs")
+    axs[2].set_ylim([0.3,1])
     plt.legend()
     plt.show()
 
