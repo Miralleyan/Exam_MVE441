@@ -50,7 +50,7 @@ x_train_np = x_train.to_numpy()
 
 # Choose which part of the code to run
 
-corr = False
+corr = True
 
 ######################################################################################################################
 ##this code classfied using 6 different classifiers
