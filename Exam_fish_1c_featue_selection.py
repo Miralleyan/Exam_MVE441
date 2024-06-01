@@ -105,7 +105,7 @@ for run in range(1,16):
 
             KNN_features = pd.DataFrame(data=SK_KNN.scores_, columns=["KNN"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
 
-            time1 = time.time()
+
             ### QDA ###
             QDA = QuadraticDiscriminantAnalysis(reg_param=0.5)
 
@@ -117,10 +117,9 @@ for run in range(1,16):
 
             QDA_features = pd.DataFrame(data=SFS_QDA.support_, columns=["QDA"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
             time2 = time.time()
-            print(time2-time1)
+
 
             '''
-            time1 = time.time()
             ### SVC ###
             svc = SVC(kernel="rbf", class_weight="balanced", probability = True)
 
@@ -132,14 +131,11 @@ for run in range(1,16):
             #svc.fit(x_SVC, y)
             SVC_features = pd.DataFrame(data=SFS_SVC.support_, columns=["SVC"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
 
+            '''
             ### Merging data ###
             feature_scores = feature_scores._append(pd.concat([KNN_features, QDA_features], axis=1))
-            time2 = time.time()
-            print(time2-time1)
-            '''
 
-        ### Saving data ###
-        feature_scores.to_csv(f"./Data/feature_scores_{n}_feat_extra_feat_{run}", sep=",")
+            
 
         ### Saving data ###
         if corr == 1:
