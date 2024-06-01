@@ -13,6 +13,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 from scipy import stats
+import time
 
 ## Functions
 def plott(x, k):
@@ -64,7 +65,7 @@ for run in range(1,16):
     new_features = pd.concat([pd.DataFrame(data = stats.norm(loc =stats.norm(scale = 4).rvs(), scale = 3).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{(run-1)*add+i}"]) for i in range(add)], axis=1)
 
     ## Correlated ##
-    new_features_corr =pd.concat([pd.DataFrame(data = x_train[x_train.columns[i%6]].to_numpy()*stats.norm(scale = 2).rvs() +stats.norm(scale = 10).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{(run-1)*add+i}"]) for i in range(add)], axis=1)
+    new_features_corr = pd.concat([pd.DataFrame(data = x_train[x_train.columns[i%6]].to_numpy()*stats.norm(scale = 2).rvs() +stats.norm(scale = 10).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{(run-1)*add+i}"]) for i in range(add)], axis=1)
     if corr == 1:
         x_train = pd.concat([x_train,new_features_corr], axis = 1)
     else:
@@ -104,7 +105,7 @@ for run in range(1,16):
 
             KNN_features = pd.DataFrame(data=SK_KNN.scores_, columns=["KNN"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
 
-
+            time1 = time.time()
             ### QDA ###
             QDA = QuadraticDiscriminantAnalysis(reg_param=0.5)
 
@@ -115,9 +116,10 @@ for run in range(1,16):
             #QDA.fit(x_QDA, y)
 
             QDA_features = pd.DataFrame(data=SFS_QDA.support_, columns=["QDA"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
+            time2 = time.time()
+            print(time2-time1)
 
-
-            
+            time1 = time.time()
             ### SVC ###
             svc = SVC(kernel="rbf", class_weight="balanced", probability = True)
 
@@ -129,10 +131,10 @@ for run in range(1,16):
             #svc.fit(x_SVC, y)
             SVC_features = pd.DataFrame(data=SFS_SVC.support_, columns=["SVC"], index=[l for l in range((6+add*run)*i, (6+add*run)*(i+1))])
 
-
             ### Merging data ###
             feature_scores = feature_scores._append(pd.concat([KNN_features, QDA_features, SVC_features], axis=1))
-
+            time2 = time.time()
+            print(time2-time1)
 
         ### Saving data ###
         feature_scores.to_csv(f"./Data/feature_scores_{n}_feat_extra_feat_{run}", sep=",")
