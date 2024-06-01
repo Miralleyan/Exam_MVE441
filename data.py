@@ -98,10 +98,10 @@ def calculate(data):
         accuracy_mean += class_accuracy[:,:,i]/7
     return sensitivity, specificty, accuracy, class_sensitivity, class_specificty, class_accuracy
 
-extra_feat = 1
+extra_feat = 0
 plot_certain = 0
 plot_uncertain = 0
-plot_mislabel  = 0
+plot_mislabel  = 1
 all_feat = 0
 calc = 0
 total = 0
@@ -384,15 +384,19 @@ if total == 1 :
 
     axs[0].boxplot(accuracy)
     axs[0].title.set_text("Accuracy")
-    axs[0].set(xlabel='KNN         QDA            LR            RF            SVC          LDA', ylabel='Accuracy', ylim=[0.4,1] )
+    axs[0].set_xticks(list(range(1,7)), labels = ["KNN", "QDA", "LR", "RF","SVC", "LDA"])
+    axs[0].set(ylabel='Accuracy', ylim=[0.7,1] )
 
     axs[1].boxplot(specificty)
     axs[1].title.set_text("Specificity")
-    axs[1].set(xlabel='KNN         QDA            LR            RF            SVC          LDA', ylabel ="Specificity", ylim=[0.4,1] )
+    axs[1].set_xticks(list(range(1,7)), labels = ["KNN", "QDA", "LR", "RF","SVC", "LDA"])
+    axs[1].set(ylabel ="Specificity", ylim=[0.7,1] )
                 
     axs[2].boxplot(sensitivity)
     axs[2].title.set_text("Sensitivity")
-    axs[2].set(xlabel='KNN         QDA            LR            RF            SVC          LDA', ylabel = "Sensitivity", ylim=[0.4,1] )
+    axs[2].set_xticks(list(range(1,7)), labels = ["KNN", "QDA", "LR", "RF","SVC", "LDA"])
+
+    axs[2].set(ylabel = "Sensitivity", ylim=[0.7,1] )
     plt.show()
 
     fig, axs = plt.subplots(1,7)
