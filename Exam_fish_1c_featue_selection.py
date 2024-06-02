@@ -50,7 +50,7 @@ x_train_np = x_train.to_numpy()
 
 # Choose which part of the code to run
 
-corr = False
+corr = True
 
 ######################################################################################################################
 ##this code classfied using 6 different classifiers
@@ -58,18 +58,27 @@ corr = False
 
 ### Adding extra features ###
 add = 200
-for run in range(1,16):
+for run in range(10,16):
     print(f"Now have {add*run} features")
 
     ## Not correlated ##
     new_features = pd.concat([pd.DataFrame(data = stats.norm(loc =stats.norm(scale = 4).rvs(), scale = 3).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{(run-1)*add+i}"]) for i in range(add)], axis=1)
 
-    ## Correlated ##
     new_features_corr = pd.concat([pd.DataFrame(data = x_train[x_train.columns[i%6]].to_numpy()*stats.norm(scale = 2).rvs() +stats.norm(scale = 10).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{(run-1)*add+i}"]) for i in range(add)], axis=1)
-    if corr == 1:
-        x_train = pd.concat([x_train,new_features_corr], axis = 1)
+
+
+    ## Correlated #
+    if run == 10:
+        x_train = pd.read_csv("./x_train_corr", index_col=0)
     else:
-        x_train = pd.concat([x_train, new_features], axis = 1)
+        if corr == 1:
+            x_train = pd.concat([x_train,new_features_corr], axis = 1)
+            x_train.to_csv("./x_train_corr", sep=",")
+        else:
+            x_train = pd.concat([x_train, new_features], axis = 1)
+            x_train.to_csv("./x_train", sep=",")
+    
+    
 
     #if run == 1:
     #    continue
@@ -80,7 +89,7 @@ for run in range(1,16):
     x_scaled = pd.DataFrame(data = x_scaled_np, index=x_train.index, columns= x_train.columns)
 
 
-    for n in range(1,7):
+    for n in range(4,7):
         print(f"Features {n}:")
         feature_scores = pd.DataFrame()
 

@@ -158,6 +158,7 @@ for n in range(1,7):
 
         ## Prediction ##
         LR.fit(x_LR, y)
+        print(LR.coef_)
         y_pred = LR.predict(x_LR_val)
 
         if n == 6:
@@ -256,12 +257,12 @@ for n in range(1,7):
 
 
     ### Saving data ###
-    feature_scores.to_csv(f"./Data/feature_scores_{n}_feat", sep=",")
-    y_pred_mat.to_csv(f"./Data/y_pred_mat_{n}_feat", sep=",")
-    con_mat.to_csv(f"./Data/con_mat_{n}_feat", sep=",")
+    #feature_scores.to_csv(f"./Data/feature_scores_{n}_feat", sep=",")
+    #y_pred_mat.to_csv(f"./Data/y_pred_mat_{n}_feat", sep=",")
+    #con_mat.to_csv(f"./Data/con_mat_{n}_feat", sep=",")
 
-    if n == 6:
-        class_prob.to_csv(f"./Data/class_prob_mean", sep=",")
+    #if n == 6:
+    #    class_prob.to_csv(f"./Data/class_prob_mean", sep=",")
 
 
 
