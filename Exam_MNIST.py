@@ -18,7 +18,7 @@ x_train, x_test, y_train, y_test = train_test_split(MyNIST,labels, train_size=0.
 
 componenets = 10
 
-skf = StratifiedKFold(n_splits=5)
+skf = StratifiedKFold(n_splits=10)
 for i, (_, batch_index, ) in enumerate(skf.split(x_train, y_train)):
     x_batch = x_train.iloc[batch_index]
     y_batch = y_train.iloc[batch_index]

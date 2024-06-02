@@ -58,7 +58,7 @@ corr = True
 
 ### Adding extra features ###
 add = 200
-for run in range(10,16):
+for run in range(11,16):
     print(f"Now have {add*run} features")
 
     ## Not correlated ##
@@ -68,8 +68,11 @@ for run in range(10,16):
 
 
     ## Correlated #
-    if run == 10:
-        x_train = pd.read_csv("./x_train_corr", index_col=0)
+    if run == 11:
+        if corr == 1:
+            x_train = pd.read_csv("./x_train_corr", index_col=0)
+        else:
+            x_train = pd.read_csv("./x_train", index_col=0)
     else:
         if corr == 1:
             x_train = pd.concat([x_train,new_features_corr], axis = 1)
