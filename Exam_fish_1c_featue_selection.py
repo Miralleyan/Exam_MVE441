@@ -67,7 +67,7 @@ for run in range(10,16):
     new_features_corr = pd.concat([pd.DataFrame(data = x_train[x_train.columns[i%6]].to_numpy()*stats.norm(scale = 2).rvs() +stats.norm(scale = 10).rvs(size = len(x_train)), index=x_train.index , columns=[f"S_{(run-1)*add+i}"]) for i in range(add)], axis=1)
 
 
-    ## Correlated ##
+    ## Correlated #
     if run == 10:
         x_train = pd.read_csv("./x_train_corr", index_col=0)
     else:
