@@ -103,9 +103,9 @@ def calculate(data):
     for i in range(7):
         accuracy_mean += class_accuracy[:,:,i]/7
     return sensitivity, specificty, accuracy, class_sensitivity, class_specificty, class_accuracy
-
-extra_feat = 1
-extra_feat_corr = 1
+extra_feat_dic = 1
+extra_feat = 0
+extra_feat_corr = 0
 plot_certain = 0
 plot_uncertain = 0
 plot_mislabel  = 0
@@ -116,6 +116,44 @@ acc_classes = 0
 feat_dic = 0
 plot_accuracy_feat = 0
 acc_classes_features = 0
+
+
+if extra_feat_dic == 1:
+    for s in range(1,7):
+        feature_dict = {model: [0]*6 for model in methods}
+        #print(feature_dict)
+        feature_scores = pd.read_csv(f"./Data/feature_scores_{s}_feat_extra_feat{p}", index_col=0)
+
+        new = np.zeros((60,1))
+        #new_QDA = np.zeros((60,1))
+        for t in range(10):
+            feat_score = feature_scores.iloc[[p for p in range(6*t, 6*(t+1))]]["KNN"].values
+            #feat_score_QDA = feature_scores.iloc[[p for p in range(6*t, 6*(t+1))]]["QDA"].values
+            #print(feat_score)
+            
+            for f in range(s):
+                ind = np.argmax(feat_score)
+                #ind_QDA = np.argmax(feat_score_QDA)
+                new[6*t+ind] = 1
+                #new_QDA[6*t+ind_QDA] = True
+
+                feat_score[ind] = -1000
+                #feat_score_QDA[ind] = -1000
+        #feature_scores.QDA = pd.DataFrame(new_QDA, columns=["QDA"])
+        feature_scores.KNN = pd.DataFrame(new, columns=["KNN"])
+        #print(feature_scores)
+
+
+
+        for model in methods:
+            for i in range(10):
+
+                feature_dict[model]+= feature_scores.iloc[[p for p in range(6*i, 6*(i+1))]][model].values
+        print(feature_dict)
+
+
+
+
 
 if extra_feat == 1:
     nr= 15
