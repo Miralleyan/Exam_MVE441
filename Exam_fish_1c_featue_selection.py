@@ -89,7 +89,7 @@ for run in range(10,16):
     x_scaled = pd.DataFrame(data = x_scaled_np, index=x_train.index, columns= x_train.columns)
 
 
-    for n in range(1,7):
+    for n in range(4,7):
         print(f"Features {n}:")
         feature_scores = pd.DataFrame()
 
