@@ -31,7 +31,19 @@ else:
     x_TSNE.to_csv(f"./TSNE_data_{components}", sep = ",")
     print("Calculated TSNE")
 
+for i in range(10):
+    print(f"Class {i}: ", sum(y_train.to_numpy() == i))
 
+
+
+"""
+for ind in x_train.index:
+    if y_train.loc[ind] == 6:
+        plt.imshow(x_train.loc[ind].to_numpy().reshape(28,28))
+        plt.show()
+"""
+
+quit()
 
 for size in [0.01, 0.05, 0.1, 0.25, 0.4, 0.55, 0.7]:
     y_pred = pd.DataFrame()
