@@ -125,8 +125,8 @@ def calculate(data):
 class_acc_2 = 0
 pred_2 = 0
 extra_feat_dic = 1
+extra_feat_2 = 1
 extra_feat = 0
-extra_feat_corr = 0
 plot_certain = 0
 plot_uncertain = 0
 plot_mislabel  = 0
@@ -185,8 +185,8 @@ if pred_2 == 1:
     plt.show()
 
 if extra_feat_dic == 1:
-    s=6
-    for p in range(1,16): ###FEl i beräkning av KNN
+    s=3
+    for p in range(1,16): 
         feature_dict = {model: {} for model in ["KNN", "QDA"]}
         #print(feature_dict)
         feature_scores = pd.read_csv(f"./Data/feature_scores_{s}_feat_extra_feat_{p}", index_col=0)
@@ -195,24 +195,18 @@ if extra_feat_dic == 1:
         for t in range(10):
             feat_score = feature_scores.iloc[[p for p in range((200*p+6)*t, (200*p+6)*(t+1))]]["KNN"].values
             
-            for f in range(6):
+            for f in range(s):
                 ind = np.argmax(feat_score)
-                #ind_QDA = np.argmax(feat_score_QDA)
                 new[(200*p+6)*t+ind] = 1
-                #new_QDA[6*t+ind_QDA] = True
 
                 feat_score[ind] = -1000
 
-        #feature_scores.QDA = pd.DataFrame(new_QDA, columns=["QDA"])
         feature_scores.KNN = pd.DataFrame(new, columns=["KNN"])
-        #print(feature_scores)
 
-        #print(feature_scores["KNN"][[l for l in range(10)]])
         count = 0
         for model in ["KNN", "QDA"]:
             for i in range(10):
                 for j in range((200*p+6)*i, (200*p+6)*(i+1)):
-                    #print(feature_scores[model].iloc[[j]].values)
                     
                     if feature_scores[model].iloc[[j]].values == 1:
                         count +=1
@@ -220,14 +214,40 @@ if extra_feat_dic == 1:
                             feature_dict[model][j%(200*p+6)] += 1
                         else:
                             feature_dict[model][j%(200*p+6)] = 1
-                #feature_dict[model]+= feature_scores.iloc[[p for p in range((200*p+6)*t, (200*p+6)*(t+1))]]["KNN"].values
         print(feature_dict)
 
+
+if extra_feat_2 == 1:
+    fig, axs = plt.subplots(2,1)
+    nr= 14
+    KNN_acc = np.zeros((nr+1,1))
+    QDA_acc = np.zeros((nr+1,1))
+
+    y_pred = pd.read_csv(f"./Data/y_pred_mat_{6}_feat", index_col=0)
+    KNN_acc[0] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+    QDA_acc[0] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+
+
+
+    for i in range(1,nr+1):
+        y_pred = pd.read_csv(f"./Data/pred_feat_{6}_extra_feat_{i}", index_col=0)
+        KNN_acc[i] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+        QDA_acc[i] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+    print(QDA_acc)
+    print(KNN_acc)
+    axs[0].plot(KNN_acc, label = "KNN")
+    axs[0].plot(QDA_acc, label = "QDA")
+    axs[0].set_xticks(list(range(0,nr+1)), list(range(0,200*(nr+1), 200)))
+    axs[0].set_xlabel("Extra features (non-correlated with original features)")
+    axs[0].set_ylabel("Accuracy")
+    plt.legend()
+    plt.show()
 
 
 
 
 if extra_feat == 1:
+    fig, axs = plt.subplots(2,1)
     nr= 15
     KNN_acc = np.zeros((nr+1,1))
     QDA_acc = np.zeros((nr+1,1))
@@ -246,41 +266,40 @@ if extra_feat == 1:
         QDA_acc[i] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
         SVC_acc[i] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
 
-    plt.plot(KNN_acc, label = "KNN")
-    plt.plot(QDA_acc, label = "QDA")
-    plt.plot(SVC_acc, label = "SVC")
-    plt.xticks(list(range(0,nr+1)), list(range(0,200*(nr+1), 200)))
-    plt.xlabel("Extra features (non-correlated with original features)")
-    plt.ylabel("Accuracy")
+    axs[0].plot(KNN_acc, label = "KNN")
+    axs[0].plot(QDA_acc, label = "QDA")
+    axs[0].plot(SVC_acc, label = "SVC")
+    axs[0].set_xticks(list(range(0,nr+1)), list(range(0,200*(nr+1), 200)))
+    axs[0].set_xlabel("Extra features (non-correlated with original features)")
+    axs[0].set_ylabel("Accuracy")
     plt.legend()
-    plt.show()
+    #plt.show()
 
 
-if extra_feat_corr == 1:
-    nr= 15
-    KNN_acc = np.zeros((nr+1,1))
-    QDA_acc = np.zeros((nr+1,1))
-    SVC_acc = np.zeros((nr+1,1))
+
+    KNN_acc_corr = np.zeros((nr+1,1))
+    QDA_acc_corr = np.zeros((nr+1,1))
+    SVC_acc_corr = np.zeros((nr+1,1))
 
     y_pred = pd.read_csv(f"./Data/y_pred_mat_{6}_feat", index_col=0)
-    KNN_acc[0] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
-    QDA_acc[0] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
-    SVC_acc[0] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+    KNN_acc_corr[0] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+    QDA_acc_corr[0] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+    SVC_acc_corr[0] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
 
 
 
     for i in range(1,nr+1):
         y_pred = pd.read_csv(f"./Data/y_pred_mat_extra_feat_corr_{i}", index_col=0)
-        KNN_acc[i] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
-        QDA_acc[i] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
-        SVC_acc[i] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+        KNN_acc_corr[i] = sum(y_pred["KNN_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+        QDA_acc_corr[i] = sum(y_pred["QDA_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
+        SVC_acc_corr[i] = sum(y_pred["SVC_pred"] == y_pred["y_val"])/len(y_pred["y_val"])
 
-    plt.plot(KNN_acc, label = "KNN")
-    plt.plot(QDA_acc, label = "QDA")
-    plt.plot(SVC_acc, label = "SVC")
-    plt.xticks(list(range(0,nr+1)), list(range(0,200*(nr+1), 200)))
-    plt.xlabel("Extra features (correlated with original features)")
-    plt.ylabel("Accuracy")
+    axs[1].plot(KNN_acc_corr, label = "KNN")
+    axs[1].plot(QDA_acc_corr, label = "QDA")
+    axs[1].plot(SVC_acc_corr, label = "SVC")
+    axs[1].set_xticks(list(range(0,nr+1)), list(range(0,200*(nr+1), 200)))
+    axs[1].set_xlabel("Extra features (correlated with original features)")
+    axs[1].set_ylabel("Accuracy")
     plt.legend()
     plt.show()
 

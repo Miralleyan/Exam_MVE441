@@ -31,12 +31,12 @@ x_train, x_test, y_train, y_test = train_test_split(fish_df, fish_label, train_s
 x_train_np = x_train.to_numpy()
 
 #If the added features are correlated or not
-corr = False
+corr = True
 
 ######################################################################################################################
 ##this code classfied using 6 different classifiers
 
-x_load = pd.read_csv("./x_train", index_col= 0)
+x_load = pd.read_csv("./x_train_corr", index_col= 0)
 ### Adding extra features ###
 add = 200
 for run in range(1,16):
