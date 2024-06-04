@@ -189,7 +189,7 @@ if extra_feat_dic == 1:
     for p in range(1,16): 
         feature_dict = {model: {} for model in ["KNN", "QDA"]}
         #print(feature_dict)
-        feature_scores = pd.read_csv(f"./Data/feature_scores_{s}_feat_extra_feat_{p}", index_col=0)
+        feature_scores = pd.read_csv(f"./Data/feature_scores_{s}_feat_extra_feat_corr_{p}", index_col=0)
 
         new = np.zeros(((200*p+6)*10,1))
         for t in range(10):

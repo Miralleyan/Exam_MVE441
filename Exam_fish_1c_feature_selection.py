@@ -117,7 +117,7 @@ for run in range(1,16):
         ### Saving data ###
         if corr == 1:
             feature_scores.to_csv(f"./Data/feature_scores_{n}_feat_extra_feat_corr_{run}", sep=",")
-            y_pred_mat.to_scv(f"./Data/pred_feat_{n}_extra_feat_{run}_corr")
+            y_pred_mat.to_csv(f"./Data/pred_feat_{n}_extra_feat_{run}_corr")
         else:
             feature_scores.to_csv(f"./Data/feature_scores_{n}_feat_extra_feat_{run}", sep=",")
             y_pred_mat.to_csv(f"./Data/pred_feat_{n}_extra_feat_{run}")
