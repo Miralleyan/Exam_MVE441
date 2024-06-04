@@ -1,29 +1,12 @@
 from sklearn.model_selection import train_test_split, StratifiedKFold
-from sklearn.linear_model import LogisticRegression
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis, QuadraticDiscriminantAnalysis
-from sklearn.metrics import confusion_matrix, accuracy_score, f1_score
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectKBest, RFE, SequentialFeatureSelector, chi2, f_classif
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from tqdm import tqdm
 from scipy import stats
-
-## Functions
-def plott(x, k):
-    fig, axs = plt.subplots(k,k)
-    for j in range(k):
-        for l in range(k):
-            for color, i, species in zip(colors, range(7), fishes):
-                axs[j,l].scatter(x[y_train == i, j],x[y_train == i, l], color = color, label = species)
-                #plt.title(f"PCA {j} and {k}")
-    plt.legend()
-    plt.show()
 
 ## Load data
 fish_df = pd.read_csv("./Fish3.txt", sep=" ")
@@ -48,10 +31,7 @@ x_train, x_test, y_train, y_test = train_test_split(fish_df, fish_label, train_s
 print(x_train)
 x_train_np = x_train.to_numpy()
 
-# Choose which part of the code to run
-transform = False #Tries different ways of preprocessing the data, scaling pca, and Kbest features selection
-
-
+#If the added features are correlated or not
 corr = True
 
 ######################################################################################################################

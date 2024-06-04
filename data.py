@@ -61,6 +61,7 @@ def accuracy_fcn(data):
                     class_accuracy[i,j,l] += con_mat.iloc[s,s]
                 denom += sum(con_mat.iloc[l, k] for k in range(7) if l != k) + sum(con_mat.iloc[k,l] for k in range(7) if l != k)
                 class_accuracy[i,j,l] = class_accuracy[i,j,l]/denom
+    return accuracy, class_accuracy
 
 def accuracy_fcn_numbers(data):
     accuracy = np.zeros((10,5))
@@ -79,9 +80,6 @@ def accuracy_fcn_numbers(data):
                     class_accuracy[i,j,l] += con_mat.iloc[s,s]
                 denom += sum(con_mat.iloc[l, k] for k in range(10) if l != k) + sum(con_mat.iloc[k,l] for k in range(10) if l != k)
                 class_accuracy[i,j,l] = class_accuracy[i,j,l]/denom
-
-
-
     return accuracy, class_accuracy
 
 def calculate(data):
@@ -124,8 +122,9 @@ def calculate(data):
     for i in range(7):
         accuracy_mean += class_accuracy[:,:,i]/7
     return sensitivity, specificty, accuracy, class_sensitivity, class_specificty, class_accuracy
+class_acc_2 = 0
 pred_2 = 0
-extra_feat_dic = 0
+extra_feat_dic = 1
 extra_feat = 0
 extra_feat_corr = 0
 plot_certain = 0
@@ -139,29 +138,29 @@ feat_dic = 0
 plot_accuracy_feat = 0
 acc_classes_features = 0
 
+if class_acc_2:
+    y_pred = pd.read_csv(f"./Data/2_y_pred_{0.7}", index_col=0)
 
-y_pred = pd.read_csv(f"./Data/2_y_pred_{0.7}", index_col=0)
+    con_mat = pd.DataFrame()
 
-con_mat = pd.DataFrame()
+    for j in range(10):
+        temp_mat =pd.DataFrame()
+        y_val = y_pred[f"label"].iloc[[l for l in range(4000*j, 4000*(j+1))]].to_numpy()
+        for i in range(5):
+            y_p = y_pred[f"{methods_2[i]}"].iloc[[l for l in range(4000*j, 4000*(j+1))]].to_numpy()
+            temp_mat = pd.concat([temp_mat, pd.DataFrame(data = confusion_matrix(y_val, y_p), columns=[f"{methods_2[i]}_{l}" for l in range(10)], index = [l for l in range(10*j, 10*(j+1))])], axis = 1)
+        con_mat = con_mat._append(temp_mat)
+        
+    accuracy, class_accuracy = accuracy_fcn_numbers(con_mat)
 
-for j in range(10):
-    temp_mat =pd.DataFrame()
-    y_val = y_pred[f"label"].iloc[[l for l in range(4000*j, 4000*(j+1))]].to_numpy()
-    for i in range(5):
-        y_p = y_pred[f"{methods_2[i]}"].iloc[[l for l in range(4000*j, 4000*(j+1))]].to_numpy()
-        temp_mat = pd.concat([temp_mat, pd.DataFrame(data = confusion_matrix(y_val, y_p), columns=[f"{methods_2[i]}_{l}" for l in range(10)], index = [l for l in range(10*j, 10*(j+1))])], axis = 1)
-    con_mat = con_mat._append(temp_mat)
-    
-accuracy, class_accuracy = accuracy_fcn_numbers(con_mat)
-
-fig, axs = plt.subplots(1,10)
-for i in range(10):
-    axs[i].boxplot(class_accuracy[:,:,i], showmeans = True, meanprops = {"marker":"*"})
-    axs[i].title.set_text(f"{i}")
-    axs[i].set_xticks(list(range(1,6)), labels = methods_2)
-    axs[i].set(ylim =[0.85,1] )
-axs[0].set(ylabel='Accuracy')
-plt.show()
+    fig, axs = plt.subplots(1,10)
+    for i in range(10):
+        axs[i].boxplot(class_accuracy[:,:,i], showmeans = True, meanprops = {"marker":"*"})
+        axs[i].title.set_text(f"{i}")
+        axs[i].set_xticks(list(range(1,6)), labels = methods_2)
+        axs[i].set(ylim =[0.85,1] )
+    axs[0].set(ylabel='Accuracy')
+    plt.show()
 
 
 if pred_2 == 1:
@@ -186,36 +185,42 @@ if pred_2 == 1:
     plt.show()
 
 if extra_feat_dic == 1:
-    for s in range(1,7):
-        feature_dict = {model: [0]*6 for model in methods}
+    s=6
+    for p in range(1,16): ###FEl i beräkning av KNN
+        feature_dict = {model: {} for model in ["KNN", "QDA"]}
         #print(feature_dict)
-        feature_scores = pd.read_csv(f"./Data/feature_scores_{s}_feat_extra_feat{p}", index_col=0)
+        feature_scores = pd.read_csv(f"./Data/feature_scores_{s}_feat_extra_feat_{p}", index_col=0)
 
-        new = np.zeros((60,1))
-        #new_QDA = np.zeros((60,1))
+        new = np.zeros(((200*p+6)*10,1))
         for t in range(10):
-            feat_score = feature_scores.iloc[[p for p in range(6*t, 6*(t+1))]]["KNN"].values
-            #feat_score_QDA = feature_scores.iloc[[p for p in range(6*t, 6*(t+1))]]["QDA"].values
-            #print(feat_score)
+            feat_score = feature_scores.iloc[[p for p in range((200*p+6)*t, (200*p+6)*(t+1))]]["KNN"].values
             
-            for f in range(s):
+            for f in range(6):
                 ind = np.argmax(feat_score)
                 #ind_QDA = np.argmax(feat_score_QDA)
-                new[6*t+ind] = 1
+                new[(200*p+6)*t+ind] = 1
                 #new_QDA[6*t+ind_QDA] = True
 
                 feat_score[ind] = -1000
-                #feat_score_QDA[ind] = -1000
+
         #feature_scores.QDA = pd.DataFrame(new_QDA, columns=["QDA"])
         feature_scores.KNN = pd.DataFrame(new, columns=["KNN"])
         #print(feature_scores)
 
-
-
-        for model in methods:
+        #print(feature_scores["KNN"][[l for l in range(10)]])
+        count = 0
+        for model in ["KNN", "QDA"]:
             for i in range(10):
-
-                feature_dict[model]+= feature_scores.iloc[[p for p in range(6*i, 6*(i+1))]][model].values
+                for j in range((200*p+6)*i, (200*p+6)*(i+1)):
+                    #print(feature_scores[model].iloc[[j]].values)
+                    
+                    if feature_scores[model].iloc[[j]].values == 1:
+                        count +=1
+                        if j%(200*p+6) in feature_dict[model]:
+                            feature_dict[model][j%(200*p+6)] += 1
+                        else:
+                            feature_dict[model][j%(200*p+6)] = 1
+                #feature_dict[model]+= feature_scores.iloc[[p for p in range((200*p+6)*t, (200*p+6)*(t+1))]]["KNN"].values
         print(feature_dict)
 
 
@@ -527,8 +532,9 @@ if calc == 1:
     print(accuracy)
 
 if acc_classes== 1:
-    data = pd.read_csv("./Data/con_mat_6_feat", sep=",", index_col=0)
-    pred = pd.read_csv("./Data/y_pred_mat_6_feat", sep=",", index_col=0)
+    data = pd.read_csv("./Data/con_mat_feat", sep=",", index_col=0)
+    print(data)
+    pred = pd.read_csv("./Data/y_pred_mat_feat", sep=",", index_col=0)
     #print(pred)
     #print(data[[f"SVC_{i}" for i in range(1,8)]])
     #print(data[[f"RF_{i}" for i in range(1,8)]])
@@ -542,7 +548,7 @@ if acc_classes== 1:
     plt.show()
 
 if total == 1 :
-    data = pd.read_csv("./Data/con_mat_6_feat", index_col=0)
+    data = pd.read_csv("./Data/con_mat_feat", index_col=0)
     #print(data)
     sensitivity, specificty, accuracy, class_sensitivity, class_specificty, class_accuracy = calculate(data)
     #print(accuracy)
