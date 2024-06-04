@@ -14,16 +14,6 @@ import numpy as np
 from tqdm import tqdm
 from scipy import stats
 
-## Functions
-def plott(x, k):
-    fig, axs = plt.subplots(k,k)
-    for j in range(k):
-        for l in range(k):
-            for color, i, species in zip(colors, range(7), fishes):
-                axs[j,l].scatter(x[y_train == i, j],x[y_train == i, l], color = color, label = species)
-                #plt.title(f"PCA {j} and {k}")
-    plt.legend()
-    plt.show()
 
 ## Load data
 fish_df = pd.read_csv("./Fish3.txt", sep=" ")
@@ -60,28 +50,6 @@ transform = False #Tries different ways of preprocessing the data, scaling pca, 
 scaler = StandardScaler()
 x_scaled_np = scaler.fit_transform(x_train)
 x_scaled = pd.DataFrame(data = x_scaled_np, index=x_train.index, columns= x_train.columns)
-
-
-"""
-#plott(x_scaled, 6)
-x_classes = [x_scaled]
-for i in range(7):
-    b = [l for l in range(len(x_scaled)) if y_train[l]==i]
-    x_classes.append(x_scaled.iloc[b])
-y_classes = [y_train]
-for i in range(7):
-    y_classes.append(y_train[y_train == i])
-#print(y_classes)
-"""
-
-
-'''
-for ind in range(len(x_classes)):
-    ind += 1
-    print(f"Class{ind}:")
-    x_class = x_classes[ind]
-    y_class = y_classes[ind]
-'''
 
 
 for n in range(1,7):
