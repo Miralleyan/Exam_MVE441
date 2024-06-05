@@ -8,6 +8,12 @@ from sklearn.metrics import confusion_matrix
 fish_df = pd.read_csv("./Fish3.txt", sep=" ")
 colors = ["Blue", "Red", "Yellow", "Green", "Purple", "Black", "Pink"]
 
+
+############################################################
+#
+#This code was used to generate almost all graphs, tables and results used in the code
+#
+############################################################
 ## Modify it to easier form
 labenc = LabelEncoder()
 labenc.fit(fish_df["Species"])
@@ -122,6 +128,9 @@ def calculate(data):
     for i in range(7):
         accuracy_mean += class_accuracy[:,:,i]/7
     return sensitivity, specificty, accuracy, class_sensitivity, class_specificty, class_accuracy
+
+
+#### WHat part of the code you wish to run ####
 class_acc_2 = 0
 pred_2 = 0
 extra_feat_dic = 1
