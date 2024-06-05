@@ -125,11 +125,7 @@ for size in [0.01, 0.05, 0.1, 0.25, 0.4, 0.55, 0.7]:
         y_pred = y_pred._append(pd.concat([y_val, y_pred_KNN, y_pred_RF, y_pred_SVC, y_pred_LR, y_pred_LDA], axis = 1))
 
     y_pred.to_csv(f"./Data/2_y_pred_{size}")
-#y_pred_mat = y_pred_mat._append(pd.concat([KNN_y_pred, QDA_y_pred, LR_y_pred, RF_y_pred, SVC_y_pred, LDA_y_pred], axis=1))
-#class_prob = class_prob._append((KNN_prob + QDA_prob + LR_prob + RF_prob + SVC_prob + LDA_prob)/6)
 
-#pred_batch = pred_batch._append(pd.DataFrame(data = np.array([y_predict_KNN, y_predict_RF]).T, columns= ["KNN", "RF"], index=[l for l in range(val_size*j,val_size*(j+1))]))
-#print(pred_batch)
 
 """
 for j in range(10):

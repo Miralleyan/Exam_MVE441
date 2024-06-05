@@ -45,10 +45,6 @@ for i, (_, batch_index) in enumerate(skf.split(x_train, y_train)):
     axs[0,0].set_title("Truncated SVD")
 
 
-    #print(x_SVD[0,:].reshape(1,-1))
-    #pic_SVD = SVD.inverse_transform(x_SVD[0,:].reshape(1,-1))
-    #axs[1].imshow(pic_SVD.reshape(28,28))
-
 
     ### KPCA ###
     KPCA = KernelPCA(n_components=componenets, kernel="linear", random_state=42, fit_inverse_transform=True)
@@ -65,8 +61,6 @@ for i, (_, batch_index) in enumerate(skf.split(x_train, y_train)):
     fig.colorbar(im2, ax=[axs[0,1], axs[1,1]])
     axs[0,1].set_title("Kernel PCA")
 
-    #pic_KPCA = KPCA.inverse_transform(x_KPCA[0,:].reshape(1,-1))
-    #axs[2].imshow(pic_KPCA.reshape(28,28))
 
 
     ### NMF ####
@@ -90,9 +84,6 @@ for i, (_, batch_index) in enumerate(skf.split(x_train, y_train)):
     SPCA = SparsePCA(n_components=componenets, alpha=1)
     x_SPCA = SPCA.fit_transform(x_batch)
 
-    print(SPCA.components_)
-    print(sum(SPCA.components_[0] !=0))
-    print(sum(SPCA.components_ [1]!=0))
     comp1_SPCA = SPCA.components_[0] #nmf.inverse_transform(np.array([1,0]).reshape(1,-1))
     comp2_SPCA = SPCA.components_[1] #nmf.inverse_transform(np.array([0,1]).reshape(1,-1))
 
@@ -104,11 +95,6 @@ for i, (_, batch_index) in enumerate(skf.split(x_train, y_train)):
 
     fig.colorbar(im4, ax=[axs[0,3], axs[1,3]])
     axs[0,3].set_title("Sparse PCA")
-
-    #fig.colorbar(cax, ax=[axs[i,j] for i in range(2) for j in range(4)])
-    #plt.show()
-    #pic_NMF = nmf.inverse_transform(x_NMF[0,:].reshape(1,-1))
-    #axs[3].imshow(pic_NMF.reshape(28,28))
 
 
     tsne = TSNE(n_components=componenets, random_state=42)
