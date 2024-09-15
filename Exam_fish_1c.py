@@ -54,8 +54,6 @@ for run in range(1,16):
     else:
         x_train = pd.concat([x_train,new_features], axis = 1)
     
-    #if run == 1:
-    #    continue
 
     ### Scaling data ###
     scaler = StandardScaler()
